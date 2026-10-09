@@ -1,41 +1,37 @@
-# বাজার দর / BazarDor
+# বাজার দর (BazarDor)
 
-BazarDor is a responsive Bangla market-price dashboard built with Next.js. It helps users track essential grocery prices, browse products by category, view detailed market summaries, and sign in or register securely on the app.
+An intuitive and efficient web application designed to track, compare, and manage daily market prices (bazar rates) in real time. **BazarDor** provides users with an effortless way to browse product categories, check item prices, and streamline their shopping experience.
 
-## Technologies used
+---
 
-- Next.js 16
-- TypeScript
-- React 19
-- Tailwind CSS
-- Lucide React
-- React Hot Toast
+## 🚀 Key Features
 
-## Key features
+* **Real-time Price Tracking:** View up-to-date daily market prices for essential grocery and household items.
+* **Category-based Browsing:** Easily navigate through dynamic product categories to find specific market goods.
+* **Product Detail Pages:** Dynamic routing providing deep insights into specific items, including unit pricing and category details.
+* **User Authentication:** Dedicated sign-in and sign-up flows for a personalized user experience.
+* **Responsive UI & Quick Loading:** Built with server-side rendering and custom loading states for a fast, mobile-friendly interface.
 
-1. Responsive market dashboard with hero banner and price ticker
-2. Product overview sections for rising and falling prices
-3. Category pages with sorting and loading states
-4. Protected product detail views for logged-in users only
-5. Sign-in and sign-up flows with local authentication and toast feedback
-6. Friendly 404 handling and route-safe product/category pages
+---
 
-## Getting started
+## 🛠️ Tech Stack
 
-```bash
-npm install
-npm run dev
-```
+* **Framework:** [Next.js](https://nextjs.org/) (App Router, TypeScript)
+* **Styling:** CSS / Global Styles
+* **Language:** TypeScript
+* **Tooling & Linting:** ESLint, PostCSS
 
-Then open http://localhost:3000 in the browser.
+---
 
-## Project highlights
+## 📦 Getting Started
 
-- Bengali-friendly product names and market UI
-- Mobile, tablet, and desktop responsive layouts
-- Clean product cards with live-style price change badges
-- Route-based product browsing and category filters
+### Prerequisites
 
-## Notes
+Make sure you have **Node.js** (v18 or higher) and **npm** installed on your system.
 
-This project is designed as a polished frontend implementation for the BazarDor assignment and is ready for local development and deployment.
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/your-username/bazar-dor.git](https://github.com/your-username/bazar-dor.git)
+   cd bazar-dor
