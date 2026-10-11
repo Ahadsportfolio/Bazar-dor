@@ -3,11 +3,10 @@ import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 import { MongoClient } from "mongodb";
 
-const mongoUri = process.env.MONGODB_URI ?? process.env.BETTER_AUTH_MONGODB_URI;
-
-if (!mongoUri) {
-  throw new Error("Set MONGODB_URI to configure BetterAuth.");
-}
+const mongoUri =
+  process.env.MONGODB_URI ??
+  process.env.BETTER_AUTH_MONGODB_URI ??
+  "mongodb://127.0.0.1:27017/bazar-dor";
 
 const globalForMongo = globalThis as typeof globalThis & {
   mongoClient?: MongoClient;
@@ -20,7 +19,9 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const socialProviders = {
-  ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+  ...(process.env.GOOGLE_CLIENT_ID &&
+  process.env.GOOGLE_CLIENT_SECRET &&
+  process.env.GOOGLE_CLIENT_ID !== "..."
     ? {
         google: {
           clientId: process.env.GOOGLE_CLIENT_ID,
@@ -28,7 +29,9 @@ const socialProviders = {
         },
       }
     : {}),
-  ...(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
+  ...(process.env.GITHUB_CLIENT_ID &&
+  process.env.GITHUB_CLIENT_SECRET &&
+  process.env.GITHUB_CLIENT_ID !== "..."
     ? {
         github: {
           clientId: process.env.GITHUB_CLIENT_ID,
@@ -38,13 +41,28 @@ const socialProviders = {
     : {}),
 };
 
+const baseURL =
+  process.env.BETTER_AUTH_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000");
+
 export const auth = betterAuth({
-  secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
+  secret: process.env.BETTER_AUTH_SECRET || "build_time_secret_placeholder_must_be_32_chars_long",
+  baseURL,
   database: mongodbAdapter(db, { client }),
   plugins: [nextCookies()],
   emailAndPassword: {
     enabled: true,
   },
+  trustedOrigins: [
+    baseURL,
+    ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
+    ...(process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? [`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`]
+      : []),
+  ],
   ...(Object.keys(socialProviders).length > 0 ? { socialProviders } : {}),
 });
