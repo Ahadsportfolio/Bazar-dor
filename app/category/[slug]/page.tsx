@@ -1,10 +1,6 @@
 import { notFound } from "next/navigation";
 import { CategoryPageClient } from "@/components/site";
-import { categoryMeta, getProductsByCategory } from "@/lib/data";
-
-export async function generateStaticParams() {
-  return Object.keys(categoryMeta).map((slug) => ({ slug }));
-}
+import { getMarketCategories, getMarketCategory, getMarketProducts } from "@/lib/market-api";
 
 export default async function CategoryPage({
   params,
@@ -12,11 +8,22 @@ export default async function CategoryPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const products = getProductsByCategory(slug);
+  const [category, products, categories] = await Promise.all([
+    getMarketCategory(slug),
+    getMarketProducts(slug),
+    getMarketCategories(),
+  ]);
 
-  if (!categoryMeta[slug] || products.length === 0) {
+  if (!category || products.length === 0) {
     notFound();
   }
 
-  return <CategoryPageClient category={slug} products={products} />;
+  return (
+    <CategoryPageClient
+      category={slug}
+      products={products}
+      categoryInfo={category}
+      categories={categories}
+    />
+  );
 }

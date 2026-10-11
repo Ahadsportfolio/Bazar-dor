@@ -1,6 +1,9 @@
 import { notFound } from "next/navigation";
 import { ProductDetailClient } from "@/components/site";
-import { getProductBySlug } from "@/lib/data";
+import { requireSession } from "@/lib/auth-guard";
+import { getMarketProduct } from "@/lib/market-api";
+
+export const instant = false;
 
 export default async function ProductPage({
   params,
@@ -8,7 +11,8 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  await requireSession(`/product/${encodeURIComponent(slug)}`);
+  const product = await getMarketProduct(slug);
 
   if (!product) {
     notFound();

@@ -9,8 +9,14 @@ export type Product = {
   change: number;
   description: string;
   tags: string[];
+  priceHistory?: {
+    yesterday?: number;
+    lastWeek?: number;
+    lastMonth?: number;
+  };
   bazarData: Array<{
     market: string;
+    division?: string;
     price: number;
     min: number;
     max: number;
@@ -258,17 +264,17 @@ export function formatBanglaCurrency(value: number) {
 
 export function getChangeBadge(change: number) {
   if (change > 0) {
-    return `▲ ${Math.abs(change).toFixed(1)}%`;
+    return `▲ ${formatBanglaNumber(Math.abs(change))}%`;
   }
   if (change < 0) {
-    return `▼ ${Math.abs(change).toFixed(1)}%`;
+    return `▼ ${formatBanglaNumber(Math.abs(change))}%`;
   }
   return `— ০.০%`;
 }
 
 export function getChangeClass(change: number) {
-  if (change > 0) return "bg-emerald-100 text-emerald-700";
-  if (change < 0) return "bg-rose-100 text-rose-700";
+  if (change > 0) return "bg-rose-100 text-rose-700";
+  if (change < 0) return "bg-emerald-100 text-emerald-700";
   return "bg-slate-200 text-slate-700";
 }
 

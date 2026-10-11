@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "daisyui";
 
 :root {
   --background: #f8fafc;
@@ -23,7 +24,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-bengali);
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
 h1,
@@ -48,6 +49,10 @@ a {
 .marquee-track {
   min-width: max-content;
   animation: marquee 22s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
 }
 
 @keyframes marquee {

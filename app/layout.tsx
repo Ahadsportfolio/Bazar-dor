@@ -1,15 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Hind_Siliguri } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const hindSiliguri = Hind_Siliguri({
+  subsets: ["bengali", "latin"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -21,9 +16,17 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html
       lang="bn"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      data-theme="light"
+      data-scroll-behavior="smooth"
+      className="h-full"
+      suppressHydrationWarning
     >
-      <body className="min-h-full bg-slate-50 text-slate-800">{children}</body>
+      <body
+        suppressHydrationWarning
+        className={`${hindSiliguri.className} min-h-full bg-slate-50 text-slate-800 antialiased`}
+      >
+        {children}
+      </body>
     </html>
   );
 }
