@@ -55,15 +55,15 @@ npm run build
 | --- | --- |
 | `BETTER_AUTH_SECRET` | Required, private signing secret; use a unique random value in every environment. |
 | `BETTER_AUTH_URL` | Public base URL for BetterAuth, such as `http://localhost:3000`. |
+| `BETTER_AUTH_TRUSTED_ORIGINS` | Optional, comma-separated exact origins to trust in addition to the configured app and Vercel URLs. |
 | `MONGODB_URI` | MongoDB connection string used by BetterAuth. `BETTER_AUTH_MONGODB_URI` is accepted as a legacy alias. |
 | `MONGODB_DATABASE` | Optional database name; if omitted, MongoDB uses the database from the connection string. |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Optional Google OAuth credentials. |
 | `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | Optional GitHub OAuth credentials. |
-| `NEXT_PUBLIC_APP_URL` | Optional browser-visible app URL; defaults to the current origin. |
 | `BAZARDOR_API_URL` | Optional override for the primary market API base URL. |
 
 The API adapter tries the primary Workers API and its documented alternative, then falls back to the bundled sample catalog if both are unavailable.
 
 ## Deployment Notes
 
-Dynamic product and category routes are rendered on demand and can be refreshed directly. Configure all auth environment variables on the hosting platform. Use a MongoDB deployment that supports transactions when enabling the MongoDB adapter with its client. Google/GitHub OAuth also needs production callback URLs registered with each provider.
+Dynamic product and category routes are rendered on demand and can be refreshed directly. Configure all auth environment variables on the hosting platform. For Vercel previews, leave `BETTER_AUTH_URL` unset to use the branch URL automatically, or set it to that preview's exact URL; do not set it to `localhost`. Vercel preview branch and deployment URLs are trusted automatically; add any custom preview alias to `BETTER_AUTH_TRUSTED_ORIGINS` as a comma-separated exact origin (for example, `https://auth-dev.example.com`). The browser auth client uses the current page's origin, so it does not need a separate public app URL. Use a MongoDB deployment that supports transactions when enabling the MongoDB adapter with its client. Google/GitHub OAuth also needs production callback URLs registered with each provider.
