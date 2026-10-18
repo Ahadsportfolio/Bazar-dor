@@ -2,11 +2,22 @@ import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 import { MongoClient } from "mongodb";
+import { getConfiguredSocialProviders } from "@/lib/social-providers";
 
 const mongoUri =
-  process.env.MONGODB_URI ??
-  process.env.BETTER_AUTH_MONGODB_URI ??
-  "mongodb://127.0.0.1:27017/bazar-dor";
+  process.env.MONGODB_URI?.trim() ||
+  process.env.BETTER_AUTH_MONGODB_URI?.trim();
+const secret = process.env.BETTER_AUTH_SECRET?.trim();
+
+if (!mongoUri) {
+  throw new Error(
+    "MONGODB_URI (or BETTER_AUTH_MONGODB_URI) must be configured for Better Auth.",
+  );
+}
+
+if (!secret || secret.length < 32) {
+  throw new Error("BETTER_AUTH_SECRET must be configured with at least 32 characters.");
+}
 
 const globalForMongo = globalThis as typeof globalThis & {
   mongoClient?: MongoClient;
@@ -18,28 +29,7 @@ if (process.env.NODE_ENV !== "production") {
   globalForMongo.mongoClient = client;
 }
 
-const socialProviders = {
-  ...(process.env.GOOGLE_CLIENT_ID &&
-  process.env.GOOGLE_CLIENT_SECRET &&
-  process.env.GOOGLE_CLIENT_ID !== "..."
-    ? {
-        google: {
-          clientId: process.env.GOOGLE_CLIENT_ID,
-          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        },
-      }
-    : {}),
-  ...(process.env.GITHUB_CLIENT_ID &&
-  process.env.GITHUB_CLIENT_SECRET &&
-  process.env.GITHUB_CLIENT_ID !== "..."
-    ? {
-        github: {
-          clientId: process.env.GITHUB_CLIENT_ID,
-          clientSecret: process.env.GITHUB_CLIENT_SECRET,
-        },
-      }
-    : {}),
-};
+const socialProviders = getConfiguredSocialProviders();
 
 const vercelProductionURL =
   process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL;
@@ -52,7 +42,7 @@ const vercelBaseURL =
     ? vercelProductionURL
     : vercelPreviewURL;
 const baseURL =
-  process.env.BETTER_AUTH_URL ||
+  process.env.BETTER_AUTH_URL?.trim() ||
   (vercelBaseURL ? `https://${vercelBaseURL}` : "http://localhost:3000");
 const additionalTrustedOrigins =
   process.env.BETTER_AUTH_TRUSTED_ORIGINS?.split(",")
@@ -60,7 +50,7 @@ const additionalTrustedOrigins =
     .filter(Boolean) ?? [];
 
 export const auth = betterAuth({
-  secret: process.env.BETTER_AUTH_SECRET || "build_time_secret_placeholder_must_be_32_chars_long",
+  secret,
   baseURL,
   database: mongodbAdapter(db, { client }),
   plugins: [nextCookies()],

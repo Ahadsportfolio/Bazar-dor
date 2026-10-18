@@ -53,9 +53,9 @@ npm run build
 
 | Variable | Purpose |
 | --- | --- |
-| `BETTER_AUTH_SECRET` | Required, private signing secret; use a unique random value in every environment. |
-| `BETTER_AUTH_URL` | Public base URL for BetterAuth, such as `http://localhost:3000`. |
-| `BETTER_AUTH_TRUSTED_ORIGINS` | Optional, comma-separated exact origins to trust in addition to the configured app and Vercel URLs. |
+| `BETTER_AUTH_SECRET` | Required private signing secret of at least 32 characters; use a unique random value in every environment. |
+| `BETTER_AUTH_URL` | Optional canonical public base URL. Defaults to `http://localhost:3000` locally and the Vercel URL on Vercel; set it to the production custom domain when applicable. |
+| `BETTER_AUTH_TRUSTED_ORIGINS` | Optional, comma-separated exact origins (no paths) to trust in addition to the configured app and Vercel URLs. |
 | `MONGODB_URI` | MongoDB connection string used by BetterAuth. `BETTER_AUTH_MONGODB_URI` is accepted as a legacy alias. |
 | `MONGODB_DATABASE` | Optional database name; if omitted, MongoDB uses the database from the connection string. |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Optional Google OAuth credentials. |
@@ -66,4 +66,8 @@ The API adapter tries the primary Workers API and its documented alternative, th
 
 ## Deployment Notes
 
-Dynamic product and category routes are rendered on demand and can be refreshed directly. Configure all auth environment variables on the hosting platform. For Vercel previews, leave `BETTER_AUTH_URL` unset to use the branch URL automatically, or set it to that preview's exact URL; do not set it to `localhost`. Vercel preview branch and deployment URLs are trusted automatically; add any custom preview alias to `BETTER_AUTH_TRUSTED_ORIGINS` as a comma-separated exact origin (for example, `https://auth-dev.example.com`). The browser auth client uses the current page's origin, so it does not need a separate public app URL. Use a MongoDB deployment that supports transactions when enabling the MongoDB adapter with its client. Google/GitHub OAuth also needs production callback URLs registered with each provider.
+Dynamic product and category routes are rendered on demand and can be refreshed directly. Add `MONGODB_URI` and a unique `BETTER_AUTH_SECRET` of at least 32 characters to the Vercel environment settings for every environment; the app fails fast when either is missing. Use a MongoDB deployment that supports transactions.
+
+For Vercel production deployments using a custom domain, set `BETTER_AUTH_URL` to that canonical HTTPS origin (for example, `https://example.com`) in the **Production** environment only. Otherwise, Better Auth uses Vercel's project URL. For Vercel previews, leave `BETTER_AUTH_URL` unset to use the preview URL automatically, or set it to that preview's exact HTTPS origin; never use `localhost` on Vercel. Vercel preview branch and deployment URLs are trusted automatically; add any other domain/alias that serves the app to `BETTER_AUTH_TRUSTED_ORIGINS` as comma-separated exact origins without paths (for example, `https://auth-dev.example.com`).
+
+Google/GitHub buttons are shown only when that provider's client ID and secret are both configured. Register the corresponding callback URLs with each provider: `https://<your-canonical-domain>/api/auth/callback/google` and/or `https://<your-canonical-domain>/api/auth/callback/github` (use the exact Vercel preview URL when testing preview OAuth). The email/password and demo sign-in options use the Better Auth API at `/api/auth`; the browser auth client uses the current page's origin.

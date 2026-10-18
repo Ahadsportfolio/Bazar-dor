@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import { ArrowLeft, ChevronDown, Menu, ShoppingCart, UserCircle2, X } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import type { SocialProvider } from "@/lib/social-providers";
 import {
   categoryMeta,
   formatBanglaCurrency,
@@ -688,7 +689,13 @@ function getSafeNextPath(path: string | null) {
     : "/";
 }
 
-function SocialAuthButtons({ callbackURL }: { callbackURL: string }) {
+function SocialAuthButtons({
+  callbackURL,
+  enabledSocialProviders,
+}: {
+  callbackURL: string;
+  enabledSocialProviders: SocialProvider[];
+}) {
   const router = useRouter();
   const [loadingProvider, setLoadingProvider] = useState<"google" | "github" | "demo" | null>(null);
 
@@ -758,7 +765,7 @@ function SocialAuthButtons({ callbackURL }: { callbackURL: string }) {
 
   return (
     <div className="mt-6 space-y-3">
-      {(["google", "github"] as const).map((provider) => (
+      {enabledSocialProviders.map((provider) => (
         <button
           key={provider}
           type="button"
@@ -787,7 +794,11 @@ function SocialAuthButtons({ callbackURL }: { callbackURL: string }) {
   );
 }
 
-export function SigninPageClient() {
+export function SigninPageClient({
+  enabledSocialProviders,
+}: {
+  enabledSocialProviders: SocialProvider[];
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = getSafeNextPath(
@@ -878,7 +889,10 @@ export function SigninPageClient() {
             </button>
           </form>
 
-          <SocialAuthButtons callbackURL={nextPath} />
+          <SocialAuthButtons
+            callbackURL={nextPath}
+            enabledSocialProviders={enabledSocialProviders}
+          />
 
           <p className="mt-6 text-center text-sm text-slate-600">
             অ্যাকাউন্ট নেই? <Link href="/signup" className="font-semibold text-emerald-700">রেজিস্টার করুন</Link>
@@ -889,7 +903,11 @@ export function SigninPageClient() {
   );
 }
 
-export function SignupPageClient() {
+export function SignupPageClient({
+  enabledSocialProviders,
+}: {
+  enabledSocialProviders: SocialProvider[];
+}) {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -915,11 +933,11 @@ export function SignupPageClient() {
     setIsSubmitting(true);
     try {
       const { error } = await authClient.signUp.email(
-        { name, email, password: form.password },
+        { name, email, password: form.password, callbackURL: "/" },
         {
           onSuccess: () => {
             toast.success("রেজিস্টেশন সফল হয়েছে।");
-            router.push("/signin");
+            router.push("/");
           },
         },
       );
@@ -986,7 +1004,10 @@ export function SignupPageClient() {
             </button>
           </form>
 
-          <SocialAuthButtons callbackURL="/" />
+          <SocialAuthButtons
+            callbackURL="/"
+            enabledSocialProviders={enabledSocialProviders}
+          />
 
           <p className="mt-6 text-center text-sm text-slate-600">
             ইতিমধ্যে অ্যাকাউন্ট আছে? <Link href="/signin" className="font-semibold text-emerald-700">লগইন করুন</Link>
